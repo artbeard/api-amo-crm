@@ -11,30 +11,52 @@
 						@click="onSelected(defaultValue)"
 						:class="{active: defaultValue.value === currentValue.value}"
 						>Не выбрано</li>
-					<li
-						v-for="_option in data"
+					<template v-if="dataList">
+						<li
+						v-for="_option in dataList"
 						:key="_option.label"
 						@click="onSelected(_option)"
 						:class="{active: _option.value === currentValue.value}"
 						>{{_option.label}}</li>
+					</template>
 				</ul>
 			</div>
 		</div>
 	</div>
 </template>
+<script lang="ts">
+export type OptionValue = string | number | null;
+export interface IListSelectable{
+	value: OptionValue,
+	label: string
+}
+</script>
 <script setup lang="ts">
-import { ref } from 'vue'
-type OptionValue = string | number | null;
-
+import { ref, Ref, computed } from 'vue'
+/**
+ * Обявлеие свойств компонента
+ */
 const props = defineProps<{
 	modelValue: OptionValue
-	data: IListSelectable[]
+	data?: IListSelectable[]
 }>()
+
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: OptionValue): void
 }>()
 
+const dataList = computed(()=>{
+	return props.data
+})
+
+/**
+ * Статус выпадающего списка
+ */
 const dropDownStatus = ref<null|boolean>(null);
+/**
+ * Переключение видимости выпадающего списка
+ * @param show null|boolean
+ */
 const toggleDropDown = (show: null|boolean = null)=>{
 	if (show === null)
 	{
@@ -56,12 +78,21 @@ const onClickDropDown = (e: MouseEvent)=>{
 		toggleDropDown();
 	}
 }
-
+/**
+ * Дефолтное значение
+ */
 const defaultValue = ref<IListSelectable>({
 	value: null,
 	label: 'Не выбрано'
 });
-const currentValue = ref<IListSelectable>(defaultValue.value);
+/**
+ * Текущее значение
+ */
+const currentValue: Ref<IListSelectable> = ref<IListSelectable>(defaultValue.value);
+/**
+ * Обработчик события при клике на одном из элементов списка выбора
+ * @param value IListSelectable
+ */
 const onSelected = (value: IListSelectable) => {
 	currentValue.value = value;
 	toggleDropDown(false);
