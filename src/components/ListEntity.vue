@@ -8,7 +8,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="(entity, index) in entities">
+			<tr v-for="(entity, index) in entities" :key="getParamByKey('id', entity) ?? index">
 				<td
 					v-for="_colunm in tableColunnms"
 					:key="index + _colunm[0]" >{{ getParamByKey(_colunm[0], entity) }}
@@ -31,6 +31,7 @@ import { computed, toRaw } from 'vue';
  * Обявление свойств компонента
  */
 interface Props{
+	primaryKey?: string | null,
 	columns?: IColumns,
 	entityList?: IEntity[],
 }
@@ -40,6 +41,7 @@ interface Props{
 const props = withDefaults(
 	defineProps<Props>(),
 	{
+		primaryKey: () => null,
 		columns: ():IColumns => <IColumns>{id: 'id сущности', title: 'Название сущности'},
 		entityList: ():IEntity[] => <IEntity[]>[]
 	}
@@ -61,13 +63,14 @@ const entities = computed(()=>{
  * @param key string
  * @param obj IEntity
  */
-const getParamByKey = function(key: string, obj: IEntity){
+const getParamByKey = function(key: string, obj: IEntity):string | number | null {
 	if (obj.hasOwnProperty(key))
 	{
 		return obj[key]
 	}
 	return null;
 }
+//TODO сделать генерацию уникального ключа для выводв списков без id
 </script>
 <style lang="scss">
 @import '../colors.scss';
