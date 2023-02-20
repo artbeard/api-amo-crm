@@ -16,13 +16,12 @@
 		<div class="form-row" v-if="validationMessage">
 			<div class="notice error">{{ validationMessage }}</div>
 		</div>
-		<ListEntity :columns="columns" :entity-list="listEntity"></ListEntity>
+		<ListEntity :columns="columns" :entity-list="listEntity" v-if="listEntity.length > 0"></ListEntity>
 	</div>
 	<pre>
-		
+
 	</pre>
 </template>
-
 <script setup lang="ts">
 import Dropdown, { IListSelectable, OptionValue } from './components/Dropdown.vue';
 import Button from './components/Button.vue';
@@ -76,7 +75,7 @@ const listEntity = computed<IEntity[]>(() => {
  */
 const isRequest = ref<boolean>(false);
 /**
- * активация/деактивация кнопки 
+ * активация/деактивация кнопки
  */
 const disableButton = computed(()=>{
 	return typeResource.value === null;
@@ -99,7 +98,7 @@ const createResource = function(){
 		return;
 	}
 	isRequest.value = true;
-	
+
 	let newCompanyName = 'Ресурс';
 	newCompanyName = prompt('Вы можете ввести имя для создания именованой сущности', '') as string;
 	// if (!newCompanyName)
