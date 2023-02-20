@@ -18,25 +18,28 @@
 		</div>
 		<ListEntity :columns="columns" :entity-list="listEntity"></ListEntity>
 	</div>
+	<pre>
+		
+	</pre>
 </template>
 
 <script setup lang="ts">
 import Dropdown, { IListSelectable, OptionValue } from './components/Dropdown.vue';
 import Button from './components/Button.vue';
-import ListEntity, { IColumns, IEntity } from './components/ListEntity.vue'
-import { ref, reactive, computed, markRaw } from 'vue';
+import ListEntity, { IColumns } from './components/ListEntity.vue'
+import { ref, computed, markRaw } from 'vue';
+import useStore, { IEntity, ResTypes, ICreateError } from './store/store'
+
+/**
+ * Хранилище
+ */
+const store = useStore();
+
 /**
  * Тип создаваемго ресурса
  */
 const typeResource = ref<OptionValue>(null);
-/**
- * Варианты создаваемого ресурса
- */
- enum ResTypes {
-	Deal = 1,
-	Contact,
-  	Company,
-}
+
 /**
  * простой список для выбора создаваемых сущностей,
  * реактивность не нужна
@@ -61,21 +64,12 @@ const selectionList = markRaw<IListSelectable[]>([
  */
 const columns: IColumns = markRaw({
 	id: 'Id Созданной сущности',
-	title: 'Название созданной сущности',
+	name: 'Название созданной сущности',
 })
-//временное хранение моковых данных
-const listEntity:IEntity[] = reactive([
-	{
-		id: 153, title: '1-я сущность'
-	},
-	{
-		id: 154, title: '2-я сущность'
-	},
-	{
-		id: 155, title: '3-я сущность'
-	},
 
-]);
+const listEntity = computed<IEntity[]>(() => {
+	return store.entityList;
+})
 
 /**
  * Флаг выполнения запроса (для анимации)
@@ -105,5 +99,23 @@ const createResource = function(){
 		return;
 	}
 	isRequest.value = true;
+	
+	let newCompanyName = 'Ресурс';
+	newCompanyName = prompt('Вы можете ввести имя для создания именованой сущности', '') as string;
+	// if (!newCompanyName)
+	// {
+	// 	validationMessage.value = 'Введите имя ресурса';
+	// 	return;
+	// }
+
+	store.createEntity(typeResource.value as ResTypes, newCompanyName as string)
+		.catch((err: ICreateError) => {
+			validationMessage.value = err.detail;
+		})
+		.finally(()=>{
+			isRequest.value = false;
+		});
 };
+
+
 </script>
