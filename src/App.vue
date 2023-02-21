@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="form-row">
+		<div class="form-row form-center">
 			<Dropdown
 				class="form-input mr-1"
 				v-model="typeResource"
@@ -13,32 +13,28 @@
 				Создать
 			</Button>
 		</div>
-		<div class="form-row" v-if="validationMessage">
+		<div class="form-row form-center" v-if="validationMessage">
 			<div class="notice error">{{ validationMessage }}</div>
 		</div>
-		<ListEntity :columns="columns" :entity-list="listEntity" v-if="listEntity.length > 0"></ListEntity>
+		<ListEntity
+			:entity-list="listEntity"
+			v-if="listEntity.length > 0"></ListEntity>
 	</div>
-	<pre>
-
-	</pre>
 </template>
 <script setup lang="ts">
 import Dropdown, { IListSelectable, OptionValue } from './components/Dropdown.vue';
 import Button from './components/Button.vue';
-import ListEntity, { IColumns } from './components/ListEntity.vue'
+import ListEntity from './components/ListEntity.vue'
 import { ref, computed, markRaw } from 'vue';
 import useStore, { IEntity, ResTypes, ICreateError } from './store/store'
-
 /**
  * Хранилище
  */
 const store = useStore();
-
 /**
  * Тип создаваемго ресурса
  */
 const typeResource = ref<OptionValue>(null);
-
 /**
  * простой список для выбора создаваемых сущностей,
  * реактивность не нужна
@@ -57,19 +53,12 @@ const selectionList = markRaw<IListSelectable[]>([
 		label: 'Компания'
 	},
 ]);
-
 /**
- * колонки для таблицы, которя будет выводить созданные сущности сущности
+ * Список сущностей для отображения
  */
-const columns: IColumns = markRaw({
-	id: 'Id Созданной сущности',
-	name: 'Название созданной сущности',
-})
-
 const listEntity = computed<IEntity[]>(() => {
 	return store.entityList;
 })
-
 /**
  * Флаг выполнения запроса (для анимации)
  */
@@ -100,13 +89,15 @@ const createResource = function(){
 	isRequest.value = true;
 
 	let newCompanyName = 'Ресурс';
+	/**
+	 * Можно попросить пользователя ввести имя создаваемой сущности
+	 */
 	newCompanyName = prompt('Вы можете ввести имя для создания именованой сущности', '') as string;
 	// if (!newCompanyName)
 	// {
 	// 	validationMessage.value = 'Введите имя ресурса';
 	// 	return;
 	// }
-
 	store.createEntity(typeResource.value as ResTypes, newCompanyName as string)
 		.catch((err: ICreateError) => {
 			validationMessage.value = err.detail;
