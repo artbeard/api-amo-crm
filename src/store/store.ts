@@ -32,7 +32,7 @@ export enum ResTypes {
   	Company = 'company',
 }
 /**
- * Ендпоинты api
+ * Эндпоинты api
  */
 const endPoints = {
 	deal: '/api/v4/leads',
@@ -62,10 +62,9 @@ const useStore = defineStore('store', {
 		{
 			this.entityList.push(entity);
 		},
-
+		
 		async createEntity(intityType: ResTypes, entityName: string): Promise<boolean | ICreateError>
 		{
-			console.log('зппрос')
 			return axios.post(endPoints[intityType] as string, {
 				entityName
 			}, {
@@ -87,7 +86,7 @@ const useStore = defineStore('store', {
 				//Маппинг ошибок
 				let mesage = '';
 				switch(e.response.status) {
-					case 400: mesage = e.response.data.detail ?? 'Ошибка создания сушности'; break;
+					case 400: mesage = e.response.data.message ?? 'Ошибка создания сущности'; break;
 					case 401: mesage = 'Необходима авторизация'; break;
 					default: mesage = e.mesage; break;
 				}
