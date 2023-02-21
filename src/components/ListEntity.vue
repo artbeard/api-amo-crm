@@ -2,38 +2,26 @@
 	<table class="results">
 		<thead>
 			<tr>
-				<td
-					v-for="_colunm in tableColunnms"
-					:key="_colunm[0]">{{ _colunm[1] }}</td>
+				<td>id</td>
+				<td>Наименование сузности</td>
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="(entity, index) in entities" :key="getParamByKey('id', entity) ?? index">
-				<td
-					v-for="_colunm in tableColunnms"
-					:key="index + _colunm[0]" >{{ getParamByKey(_colunm[0], entity) }}
-				</td>
+			<tr v-for="entity in entities" :key="entity.id">
+				<td>{{ entity.id }}</td>
+				<td>{{ entity.name }}</td>
 			</tr>
 		</tbody>
 	</table>
 </template>
-<script lang="ts">
-export interface IColumns{
-	[key:string]: string
-}
-export interface IEntity{
-	[key:string] : string|number
-}
-</script>
 <script setup lang="ts">
-import { computed, toRaw } from 'vue';
+import { IEntity } from '../store/store';
+import { computed } from 'vue';
 /**
  * Обявление свойств компонента
  */
 interface Props{
-	primaryKey?: string | null,
-	columns?: IColumns,
-	entityList?: IEntity[],
+	entityList: IEntity[],
 }
 /**
  * Дефолтные значения для свойств
@@ -41,36 +29,15 @@ interface Props{
 const props = withDefaults(
 	defineProps<Props>(),
 	{
-		primaryKey: () => null,
-		columns: ():IColumns => <IColumns>{id: 'id сущности', title: 'Название сущности'},
 		entityList: ():IEntity[] => <IEntity[]>[]
 	}
 )
 /**
- * Массив с колонками колонок 
- */
-const tableColunnms = computed(()=>{
-	return Object.entries( <IColumns>toRaw(props.columns) );
-});
-/**
  * Список сущностей
  */
-const entities = computed(()=>{
+const entities = computed<IEntity[]>(()=>{
 	return props.entityList;
 })
-/**
- * Выводит значение свойства
- * @param key string
- * @param obj IEntity
- */
-const getParamByKey = function(key: string, obj: IEntity):string | number | null {
-	if (obj.hasOwnProperty(key))
-	{
-		return obj[key]
-	}
-	return null;
-}
-//TODO сделать генерацию уникального ключа для выводв списков без id
 </script>
 <style lang="scss">
 @import '../colors.scss';
